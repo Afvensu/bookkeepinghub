@@ -19,6 +19,7 @@
  */
 
 @theme inline {
+  --font-sans: "Plus Jakarta Sans", sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -59,29 +60,35 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-gold: var(--gold);
+  --color-logo-surface: var(--logo-surface);
+  --color-surface-band: var(--surface-band);
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  --radius: 0.5rem;
+  --background: oklch(0.145 0.025 250);
+  --foreground: oklch(0.965 0.01 240);
+  --card: oklch(0.19 0.028 246 / 78%);
+  --card-foreground: oklch(0.965 0.01 240);
+  --popover: oklch(0.18 0.028 246);
+  --popover-foreground: oklch(0.965 0.01 240);
+  --primary: oklch(0.73 0.16 162);
+  --primary-foreground: oklch(0.12 0.02 250);
+  --secondary: oklch(0.24 0.025 246);
+  --secondary-foreground: oklch(0.965 0.01 240);
+  --muted: oklch(0.22 0.022 246);
+  --muted-foreground: oklch(0.72 0.025 244);
+  --accent: oklch(0.27 0.035 224);
+  --accent-foreground: oklch(0.98 0.008 240);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --border: oklch(0.92 0.015 240 / 14%);
+  --input: oklch(0.92 0.015 240 / 19%);
+  --ring: oklch(0.73 0.16 162);
+  --gold: oklch(0.75 0.105 77);
+  --logo-surface: oklch(0.965 0.008 95);
+  --surface-band: oklch(0.18 0.026 248);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +147,119 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: var(--font-sans);
+    letter-spacing: 0;
+    scroll-behavior: smooth;
+  }
+
+  button, a, input, select {
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 35%, transparent);
+  }
+}
+
+@layer components {
+  .section-shell {
+    @apply relative mx-auto max-w-7xl px-5 py-20 sm:py-24 lg:px-8;
+  }
+
+  .section-heading {
+    @apply grid gap-5 lg:grid-cols-[1fr_0.62fr] lg:items-end;
+  }
+
+  .section-heading h2 {
+    @apply mt-5 max-w-3xl text-4xl font-semibold leading-tight sm:text-5xl;
+  }
+
+  .section-heading > p {
+    @apply max-w-xl leading-7 text-muted-foreground lg:justify-self-end;
+  }
+
+  .glass-panel {
+    @apply rounded-lg border border-border bg-card shadow-2xl backdrop-blur-xl;
+    box-shadow: 0 30px 80px -35px color-mix(in oklab, var(--primary) 24%, transparent);
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-semibold uppercase text-primary;
+  }
+
+  .eyebrow svg { @apply size-4; }
+
+  .text-highlight {
+    color: var(--primary);
+  }
+
+  .status-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary;
+  }
+
+  .status-pill svg { @apply size-3.5; }
+
+  .metric-panel {
+    @apply rounded-md border border-border bg-background/35 p-5;
+  }
+
+  .chart-bar {
+    @apply block min-h-2 rounded-t-sm bg-primary/75;
+  }
+
+  .service-card {
+    @apply rounded-lg border border-border bg-card/65 p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-primary/35;
+  }
+
+  .service-card-selected {
+    @apply border-primary/55 bg-primary/5;
+  }
+
+  .icon-box {
+    @apply flex size-11 items-center justify-center rounded-md border border-primary/25 bg-primary/10 text-primary;
+  }
+
+  .icon-box svg { @apply size-5; }
+
+  .estimate-panel {
+    background: linear-gradient(150deg, color-mix(in oklab, var(--primary) 13%, var(--card)), var(--card));
+  }
+
+  .step-card {
+    @apply min-h-64 rounded-lg border border-border bg-card/55 p-6 backdrop-blur-xl;
+  }
+
+  .team-card {
+    @apply flex flex-col gap-7 rounded-lg border border-border bg-card/65 p-5 backdrop-blur-xl sm:p-7 lg:flex-row;
+  }
+
+  .avatar-halo {
+    @apply absolute inset-4 rounded-full bg-primary/25 blur-2xl;
+  }
+
+  .badge-chip {
+    @apply rounded-full border border-border bg-background/40 px-3 py-1.5 text-xs text-muted-foreground;
+  }
+
+  .cta-band {
+    @apply flex flex-col items-start justify-between gap-8 rounded-lg border border-primary/30 bg-primary/10 p-7 backdrop-blur-xl sm:p-10 lg:flex-row lg:items-end;
+  }
+}
+
+.ambient-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 12% 15%, color-mix(in oklab, var(--primary) 14%, transparent), transparent 32%),
+    radial-gradient(circle at 88% 25%, color-mix(in oklab, var(--gold) 9%, transparent), transparent 28%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
