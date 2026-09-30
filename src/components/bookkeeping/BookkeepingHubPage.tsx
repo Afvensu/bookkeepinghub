@@ -288,10 +288,10 @@ export function BookkeepingHubPage() {
         )}
       </header>
 
-      <section id="top" className="relative mx-auto grid min-h-[calc(100vh-5rem)] max-w-7xl items-center gap-14 px-5 py-16 lg:grid-cols-[1.12fr_0.88fr] lg:px-8 lg:py-20">
+      <section id="top" className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-14 sm:min-h-[760px] lg:grid-cols-[1.12fr_0.88fr] lg:px-8 lg:py-20">
         <div className="relative z-10">
           <div className="eyebrow mb-6"><Sparkles /> Virtual bookkeeping for growing businesses</div>
-          <h1 className="max-w-4xl text-5xl font-semibold leading-[1.03] tracking-normal sm:text-6xl lg:text-7xl">Clear financials.<br /><span className="text-highlight">Reconciled accounts.</span><br />Zero guesswork.</h1>
+          <h1 className="max-w-4xl text-4xl font-semibold leading-[1.06] tracking-normal sm:text-6xl lg:text-7xl">Clear financials.<br /><span className="text-highlight">Reconciled accounts.</span><br />Zero guesswork.</h1>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-muted-foreground">We keep your accounts reconciled down to the penny, your reports on time, and your finances crystal clear—so you can run the business instead of chasing the numbers.</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" onClick={openBooking} className="h-14 rounded-full px-7 text-base">Book Free 30-Min Discovery Call <ArrowRight /></Button>
@@ -301,7 +301,7 @@ export function BookkeepingHubPage() {
           </div>
           <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><Clock3 className="size-4 text-primary" /> Monday–Friday, 9:00 AM–4:00 PM EST</p>
         </div>
-        <div className="relative mx-auto w-full max-w-xl">
+        <div className="relative mx-auto hidden w-full max-w-xl sm:block">
           <div className="glass-panel relative overflow-hidden p-5 sm:p-7">
             <div className="mb-8 flex items-center justify-between">
               <div><p className="text-xs font-semibold uppercase text-muted-foreground">Month-end close</p><p className="mt-1 text-2xl font-semibold">Financial clarity</p></div>
