@@ -164,7 +164,17 @@ export function BookkeepingHubPage() {
   const [intake, setIntake] = useState<Intake>(defaultIntake);
   const [errors, setErrors] = useState<IntakeErrors>({});
 
+    const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 15);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   useEffect(() => setDates(nextBusinessDays(7)), []);
+
 
   const estimate = useMemo(
     () => selectedServices.reduce((total, key) => total + (services.find((service) => service.key === key)?.price ?? 0), 0) + extraAccounts * 50,
@@ -256,7 +266,15 @@ export function BookkeepingHubPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
       <div className="ambient-bg" aria-hidden="true" />
-      <header className="sticky top-0 z-40 border-b border-border/70 bg-background/75 backdrop-blur-xl">
+            <header
+        className={cn(
+          "sticky top-0 z-40 transition-all duration-300",
+          scrolled
+            ? "border-b border-border/80 bg-background/70 backdrop-blur-xl shadow-lg shadow-black/20"
+            : "border-b border-transparent bg-transparent backdrop-blur-none"
+        )}
+      >
+
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-8">
           <a href="#top" className="flex items-center" aria-label="BookkeepingHub home">
             <img src="/logo.png" alt="BookkeepingHub" className="h-11 w-auto max-w-[190px] rounded-sm bg-logo-surface object-contain px-2" />
