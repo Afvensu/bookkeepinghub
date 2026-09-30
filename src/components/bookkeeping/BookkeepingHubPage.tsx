@@ -264,7 +264,7 @@ export function BookkeepingHubPage() {
     : "#";
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-background text-foreground">
+      <main className="min-h-screen overflow-x-clip bg-background text-foreground">
       <div className="ambient-bg" aria-hidden="true" />
             <header
         className={cn(
