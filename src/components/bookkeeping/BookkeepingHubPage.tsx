@@ -154,17 +154,22 @@ export function BookkeepingHubPage() {
   const [selectedServices, setSelectedServices] = useState<ServiceKey[]>(["bookkeeping"]);
   const [extraAccounts, setExtraAccounts] = useState(0);
   const [catchUp, setCatchUp] = useState(false);
-  const [currency, setCurrency] = useState<Currency>("CAD");
   const [hours, setHours] = useState(12);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(1);
   const [dates, setDates] = useState<string[]>([]);
+  const [activeWeek, setActiveWeek] = useState(0);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [intake, setIntake] = useState<Intake>(defaultIntake);
   const [errors, setErrors] = useState<IntakeErrors>({});
-
-    const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [heroSeries, setHeroSeries] = useState(baseHeroSeries);
+  const [plSeries, setPlSeries] = useState(basePlSeries);
+  const [activeBar, setActiveBar] = useState(11);
+  const [activityIndex, setActivityIndex] = useState(0);
+  const [netIncome, setNetIncome] = useState(18420);
+  const [cashOnHand, setCashOnHand] = useState(42680);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 15);
@@ -173,7 +178,29 @@ export function BookkeepingHubPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => setDates(nextBusinessDays(7)), []);
+  useEffect(() => setDates(nextBusinessDays(20)), []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setActiveBar((current) => (current + 1) % 12);
+      setActivityIndex((current) => (current + 1) % activityFeed.length);
+      setHeroSeries((current) => current.map((value, index) => drift(baseHeroSeries[index] ?? value, 5)));
+      setPlSeries((current) => current.map((value, index) => drift(basePlSeries[index] ?? value, 5)));
+      setNetIncome(() => 18420 + Math.round((Math.random() - 0.5) * 120));
+      setCashOnHand(() => 42680 + Math.round((Math.random() - 0.5) * 260));
+    }, 2600);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const weeks = useMemo(() => {
+    const grouped: string[][] = [];
+    for (let index = 0; index < dates.length; index += 5) grouped.push(dates.slice(index, index + 5));
+    return grouped;
+  }, [dates]);
+
+
 
 
   const estimate = useMemo(
