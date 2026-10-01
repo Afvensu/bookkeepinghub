@@ -42,6 +42,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { PremiumCursor } from "./PremiumCursor";
 
 type ServiceKey = "bookkeeping" | "ap" | "ar";
 
