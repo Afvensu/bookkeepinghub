@@ -43,8 +43,17 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
-type Currency = "CAD" | "USD" | "NGN";
 type ServiceKey = "bookkeeping" | "ap" | "ar";
+
+const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const baseHeroSeries = [42, 55, 46, 68, 61, 78, 88, 81, 96, 92, 108, 118];
+const basePlSeries = [38, 52, 48, 64, 58, 76, 71, 87, 80, 98, 92, 112];
+const activityFeed = [
+  "Auto-matched 14 transactions via QuickBooks Online",
+  "TD business chequing reconciled to $0.00 variance",
+  "Vendor bill scheduled for Friday payment run",
+  "Customer invoice marked paid · AR aging updated",
+];
 
 const services = [
   {
@@ -133,9 +142,12 @@ function formatDate(date: string, style: "short" | "long" = "long") {
   }).format(new Date(`${date}T12:00:00Z`));
 }
 
-function displayPrice(cad: number, currency: Currency) {
-  if (currency === "NGN") return `₦${(cad * 1000).toLocaleString("en-CA")}`;
-  return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cad);
+function displayPrice(cad: number) {
+  return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(cad);
+}
+
+function drift(base: number, spread: number) {
+  return Math.max(12, Math.round(base + (Math.random() - 0.5) * spread * 2));
 }
 
 function addThirtyMinutes(time: string) {
