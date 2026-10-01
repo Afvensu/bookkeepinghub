@@ -205,7 +205,30 @@
 
   .chart-bar {
     @apply block min-h-2 rounded-t-sm bg-primary/75;
+    transition: height 900ms cubic-bezier(0.22, 1, 0.36, 1), background-color 300ms ease, opacity 300ms ease;
+    transform-origin: bottom;
+    animation: chart-breathe 7s ease-in-out infinite;
   }
+
+  .chart-bar-active {
+    @apply bg-primary;
+    box-shadow: 0 0 18px -2px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+
+  .live-dot {
+    @apply relative inline-flex size-1.5 rounded-full bg-primary;
+  }
+
+  .live-dot::after {
+    content: "";
+    @apply absolute inset-0 rounded-full bg-primary;
+    animation: live-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .ticker-line {
+    animation: soft-fade 500ms ease-out;
+  }
+
 
   .service-card {
     @apply rounded-lg border border-border bg-card/65 p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-primary/35;
