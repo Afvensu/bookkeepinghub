@@ -279,6 +279,68 @@
     radial-gradient(circle at 88% 25%, color-mix(in oklab, var(--gold) 9%, transparent), transparent 28%);
 }
 
+@keyframes chart-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.965); }
+}
+
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.55; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes soft-fade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Premium pointer */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: opacity 250ms ease, width 200ms ease, height 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--primary);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 60%, transparent);
+}
+
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  backdrop-filter: blur(1px);
+}
+
+.cursor-active .cursor-ring {
+  width: 48px;
+  height: 48px;
+  margin: -24px 0 0 -24px;
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 70%, transparent);
+}
+
+.cursor-visible .cursor-dot,
+.cursor-visible .cursor-ring {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-ring { display: none; }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
