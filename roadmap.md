@@ -8,6 +8,10 @@
 - [x] Add team, onboarding, FAQ, and business details.
 - [x] Add supplied imagery, favicon, and search metadata.
 - [x] Verify desktop and mobile flows in the running preview.
+- [ ] Animate the hero clarity chart and client portal preview subtly.
+- [ ] Extend booking availability to four weeks.
+- [ ] Lock billing currency to CAD only.
+- [ ] Add a premium, non-distracting custom cursor.
 
 ## Deferred by scope
 
