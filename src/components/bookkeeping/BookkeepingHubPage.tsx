@@ -42,9 +42,19 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { PremiumCursor } from "./PremiumCursor";
 
-type Currency = "CAD" | "USD" | "NGN";
 type ServiceKey = "bookkeeping" | "ap" | "ar";
+
+const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const baseHeroSeries = [42, 55, 46, 68, 61, 78, 88, 81, 96, 92, 108, 118];
+const basePlSeries = [38, 52, 48, 64, 58, 76, 71, 87, 80, 98, 92, 112];
+const activityFeed = [
+  "Auto-matched 14 transactions via QuickBooks Online",
+  "TD business chequing reconciled to $0.00 variance",
+  "Vendor bill scheduled for Friday payment run",
+  "Customer invoice marked paid · AR aging updated",
+];
 
 const services = [
   {
@@ -133,9 +143,12 @@ function formatDate(date: string, style: "short" | "long" = "long") {
   }).format(new Date(`${date}T12:00:00Z`));
 }
 
-function displayPrice(cad: number, currency: Currency) {
-  if (currency === "NGN") return `₦${(cad * 1000).toLocaleString("en-CA")}`;
-  return new Intl.NumberFormat("en-CA", { style: "currency", currency, maximumFractionDigits: 0 }).format(cad);
+function displayPrice(cad: number) {
+  return new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", maximumFractionDigits: 0 }).format(cad);
+}
+
+function drift(base: number, spread: number) {
+  return Math.max(12, Math.round(base + (Math.random() - 0.5) * spread * 2));
 }
 
 function addThirtyMinutes(time: string) {
@@ -154,17 +167,22 @@ export function BookkeepingHubPage() {
   const [selectedServices, setSelectedServices] = useState<ServiceKey[]>(["bookkeeping"]);
   const [extraAccounts, setExtraAccounts] = useState(0);
   const [catchUp, setCatchUp] = useState(false);
-  const [currency, setCurrency] = useState<Currency>("CAD");
   const [hours, setHours] = useState(12);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [bookingStep, setBookingStep] = useState(1);
   const [dates, setDates] = useState<string[]>([]);
+  const [activeWeek, setActiveWeek] = useState(0);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [intake, setIntake] = useState<Intake>(defaultIntake);
   const [errors, setErrors] = useState<IntakeErrors>({});
-
-    const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [heroSeries, setHeroSeries] = useState(baseHeroSeries);
+  const [plSeries, setPlSeries] = useState(basePlSeries);
+  const [activeBar, setActiveBar] = useState(11);
+  const [activityIndex, setActivityIndex] = useState(0);
+  const [netIncome, setNetIncome] = useState(18420);
+  const [cashOnHand, setCashOnHand] = useState(42680);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 15);
@@ -173,7 +191,29 @@ export function BookkeepingHubPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => setDates(nextBusinessDays(7)), []);
+  useEffect(() => setDates(nextBusinessDays(20)), []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => {
+      setActiveBar((current) => (current + 1) % 12);
+      setActivityIndex((current) => (current + 1) % activityFeed.length);
+      setHeroSeries((current) => current.map((value, index) => drift(baseHeroSeries[index] ?? value, 5)));
+      setPlSeries((current) => current.map((value, index) => drift(basePlSeries[index] ?? value, 5)));
+      setNetIncome(() => 18420 + Math.round((Math.random() - 0.5) * 120));
+      setCashOnHand(() => 42680 + Math.round((Math.random() - 0.5) * 260));
+    }, 2600);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const weeks = useMemo(() => {
+    const grouped: string[][] = [];
+    for (let index = 0; index < dates.length; index += 5) grouped.push(dates.slice(index, index + 5));
+    return grouped;
+  }, [dates]);
+
+
 
 
   const estimate = useMemo(
@@ -265,6 +305,7 @@ export function BookkeepingHubPage() {
 
   return (
       <main className="min-h-screen overflow-x-clip bg-background text-foreground">
+      <PremiumCursor />
       <div className="ambient-bg" aria-hidden="true" />
             <header
         className={cn(
@@ -320,14 +361,15 @@ export function BookkeepingHubPage() {
           <div className="glass-panel relative overflow-hidden p-5 sm:p-7">
             <div className="mb-8 flex items-center justify-between">
               <div><p className="text-xs font-semibold uppercase text-muted-foreground">Month-end close</p><p className="mt-1 text-2xl font-semibold">Financial clarity</p></div>
-              <div className="status-pill"><CheckCircle2 /> Reconciled</div>
+              <div className="status-pill"><span className="live-dot" /> Reconciled</div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="metric-panel sm:col-span-2">
                 <div className="flex items-start justify-between"><div><p className="text-sm text-muted-foreground">Cash flow status</p><p className="mt-2 text-3xl font-semibold">Healthy</p></div><TrendingUp className="size-7 text-primary" /></div>
                 <div className="mt-8 flex h-28 items-end gap-2" aria-label="Cash flow chart preview">
-                  {[42, 55, 46, 68, 61, 78, 88, 81, 96, 92, 108, 118].map((height, index) => <span key={index} className="chart-bar flex-1" style={{ height }} />)}
+                  {heroSeries.map((height, index) => <span key={index} title={`${monthLabels[index]} · $${(height * 220).toLocaleString("en-CA")}`} className={cn("chart-bar flex-1", activeBar === index && "chart-bar-active")} style={{ height, animationDelay: `${index * 140}ms` }} />)}
                 </div>
+                <p key={activeBar} className="ticker-line mt-4 text-xs text-muted-foreground">{monthLabels[activeBar]} reconciled · ${(((heroSeries[activeBar] ?? 0) * 220)).toLocaleString("en-CA")} net movement</p>
               </div>
               <div className="metric-panel"><p className="text-sm text-muted-foreground">Accounts matched</p><p className="mt-3 text-3xl font-semibold">100%</p><div className="mt-5 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full w-full bg-primary" /></div></div>
               <div className="metric-panel"><p className="text-sm text-muted-foreground">Books closed</p><p className="mt-3 text-3xl font-semibold">On time</p><p className="mt-5 text-xs text-primary">Ready for review</p></div>
@@ -347,7 +389,7 @@ export function BookkeepingHubPage() {
         <div className="mt-12 grid gap-5 lg:grid-cols-3">
           {services.map(({ key, icon: Icon, label, price, description, features }) => (
             <article key={key} className={cn("service-card", selectedServices.includes(key) && "service-card-selected")}>
-              <div className="flex items-start justify-between"><div className="icon-box"><Icon /></div><span className="text-xs font-semibold uppercase text-muted-foreground">From {displayPrice(price, "CAD")}/mo</span></div>
+              <div className="flex items-start justify-between"><div className="icon-box"><Icon /></div><span className="text-xs font-semibold uppercase text-muted-foreground">From {displayPrice(price)}/mo CAD</span></div>
               <h3 className="mt-8 text-2xl font-semibold">{label}</h3><p className="mt-3 min-h-14 text-sm leading-6 text-muted-foreground">{description}</p>
               <ul className="mt-7 space-y-3">{features.map((feature) => <li key={feature} className="flex gap-3 text-sm"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{feature}</li>)}</ul>
               <Button variant={selectedServices.includes(key) ? "default" : "outline"} onClick={() => toggleService(key)} className="mt-8 w-full rounded-full">{selectedServices.includes(key) ? "Included in estimate" : "Add to estimate"}</Button>
@@ -364,18 +406,18 @@ export function BookkeepingHubPage() {
               {services.map((service) => (
                 <Button key={service.key} variant="ghost" onClick={() => toggleService(service.key)} className={cn("h-auto w-full justify-between rounded-md border border-border bg-card/30 px-4 py-4 text-left", selectedServices.includes(service.key) && "border-primary/60 bg-primary/10")}>
                   <span className="flex min-w-0 items-center gap-3"><span className={cn("flex size-5 shrink-0 items-center justify-center rounded-sm border", selectedServices.includes(service.key) ? "border-primary bg-primary text-primary-foreground" : "border-border")}>{selectedServices.includes(service.key) && <Check className="size-3.5" />}</span><span className="whitespace-normal">{service.label}</span></span>
-                  <span className="ml-4 shrink-0 text-muted-foreground">+{displayPrice(service.price, currency)}</span>
+                  <span className="ml-4 shrink-0 text-muted-foreground">+{displayPrice(service.price)}</span>
                 </Button>
               ))}
             </div>
             <div className="mt-8 border-t border-border pt-8">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">Additional bank / credit card accounts</p><p className="mt-1 text-sm text-muted-foreground">{displayPrice(50, currency)} per account, per month</p></div><div className="flex items-center gap-3"><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.max(0, value - 1))} aria-label="Remove account"><Minus /></Button><span className="w-8 text-center text-lg font-semibold">{extraAccounts}</span><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.min(20, value + 1))} aria-label="Add account"><Plus /></Button></div></div>
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">Additional bank / credit card accounts</p><p className="mt-1 text-sm text-muted-foreground">{displayPrice(50)} per account, per month</p></div><div className="flex items-center gap-3"><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.max(0, value - 1))} aria-label="Remove account"><Minus /></Button><span className="w-8 text-center text-lg font-semibold">{extraAccounts}</span><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.min(20, value + 1))} aria-label="Add account"><Plus /></Button></div></div>
               <div className="mt-7 flex items-center justify-between gap-5"><div><p className="font-medium">Historical catch-up needed?</p><p className="mt-1 text-sm text-muted-foreground">Scoped and quoted during your discovery call</p></div><Switch checked={catchUp} onCheckedChange={setCatchUp} aria-label="Historical catch-up needed" /></div>
-              <div className="mt-7"><p className="mb-3 font-medium">Billing currency</p><div className="grid grid-cols-3 gap-2">{(["CAD", "USD", "NGN"] as Currency[]).map((unit) => <Button key={unit} variant={currency === unit ? "default" : "outline"} onClick={() => setCurrency(unit)} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs">{unit === "NGN" ? "NGN · ₦1,000/$1" : unit}</Button>)}</div></div>
+              <div className="mt-7 flex items-center justify-between gap-5 rounded-md border border-border bg-card/30 px-4 py-3"><div><p className="font-medium">Billing currency</p><p className="mt-1 text-sm text-muted-foreground">All plans are billed in Canadian dollars</p></div><span className="badge-chip">CAD</span></div>
             </div>
           </div>
           <aside className="estimate-panel flex flex-col justify-between p-6 sm:p-10 lg:p-12">
-            <div><p className="text-sm font-semibold uppercase text-primary">Estimated monthly investment</p><p className="mt-5 break-words text-5xl font-semibold sm:text-6xl">{displayPrice(estimate, currency)}</p><p className="mt-2 text-sm text-muted-foreground">per month · starting estimate</p></div>
+            <div><p className="text-sm font-semibold uppercase text-primary">Estimated monthly investment</p><p className="mt-5 break-words text-5xl font-semibold tabular-nums sm:text-6xl">{displayPrice(estimate)}</p><p className="mt-2 text-sm text-muted-foreground">per month · starting estimate · CAD</p></div>
             <div className="mt-10 space-y-4 border-t border-border pt-7"><div className="flex justify-between text-sm"><span className="text-muted-foreground">Selected services</span><span>{selectedServices.length}</span></div><div className="flex justify-between text-sm"><span className="text-muted-foreground">Additional accounts</span><span>{extraAccounts}</span></div><div className="flex justify-between text-sm"><span className="text-muted-foreground">Catch-up</span><span>{catchUp ? "Needs scoping" : "Not selected"}</span></div></div>
             <Button size="lg" onClick={openBooking} className="mt-10 h-14 w-full rounded-full">Lock In Estimate & Book Call <ArrowRight /></Button>
             <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">Final pricing is confirmed after we understand your books and workflow.</p>
@@ -398,7 +440,7 @@ export function BookkeepingHubPage() {
 
       <section className="section-shell grid items-stretch gap-8 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="glass-panel p-7 sm:p-10"><p className="eyebrow">Time-saved calculator</p><h2 className="mt-5 text-3xl font-semibold">Get your month back.</h2><p className="mt-4 leading-7 text-muted-foreground">How many hours do you spend on manual bookkeeping each month?</p><div className="mt-10 flex items-end justify-between"><span className="text-6xl font-semibold">{hours}</span><span className="pb-2 text-sm text-muted-foreground">hours / month</span></div><Slider className="mt-7" value={[hours]} onValueChange={([value]) => setHours(value ?? 1)} min={1} max={40} step={1} aria-label="Monthly bookkeeping hours" /><div className="mt-9 border-t border-border pt-7"><p className="text-sm text-muted-foreground">Estimated annual time reclaimed</p><p className="mt-2 text-4xl font-semibold text-highlight">{hours * 12} hours</p><p className="mt-3 text-sm leading-6 text-muted-foreground">That’s approximately {Math.round((hours * 12) / 8)} full workdays redirected to your business.</p></div></div>
-        <div className="glass-panel overflow-hidden p-5 sm:p-8"><div className="mb-7 flex items-center justify-between"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Client portal preview</p><h3 className="mt-2 text-2xl font-semibold">Financial command centre</h3></div><span className="status-pill"><span className="size-1.5 rounded-full bg-primary" /> Live</span></div><div className="grid gap-4 sm:grid-cols-3"><div className="metric-panel"><p className="text-xs text-muted-foreground">Net income</p><p className="mt-2 text-2xl font-semibold">$18,420</p><p className="mt-2 text-xs text-primary">↑ 8.2% this month</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Cash on hand</p><p className="mt-2 text-2xl font-semibold">$42,680</p><p className="mt-2 text-xs text-muted-foreground">Healthy runway</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Reconciliation</p><p className="mt-2 text-2xl font-semibold">100%</p><p className="mt-2 text-xs text-primary">All accounts matched</p></div></div><div className="metric-panel mt-4"><div className="flex justify-between"><p className="text-sm font-medium">Profit & loss snapshot</p><BarChart3 className="size-5 text-gold" /></div><div className="mt-8 grid h-40 grid-cols-12 items-end gap-2">{[38,52,48,64,58,76,71,87,80,98,92,112].map((height,index) => <span key={index} className="chart-bar" style={{height}} />)}</div></div></div>
+        <div className="glass-panel overflow-hidden p-5 sm:p-8"><div className="mb-7 flex items-center justify-between"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Client portal preview</p><h3 className="mt-2 text-2xl font-semibold">Financial command centre</h3></div><span className="status-pill"><span className="live-dot" /> Live</span></div><div className="grid gap-4 sm:grid-cols-3"><div className="metric-panel"><p className="text-xs text-muted-foreground">Net income</p><p className="mt-2 text-2xl font-semibold tabular-nums">${netIncome.toLocaleString("en-CA")}</p><p className="mt-2 text-xs text-primary">↑ 8.2% this month</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Cash on hand</p><p className="mt-2 text-2xl font-semibold tabular-nums">${cashOnHand.toLocaleString("en-CA")}</p><p className="mt-2 text-xs text-muted-foreground">Healthy runway</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Reconciliation</p><p className="mt-2 text-2xl font-semibold">100%</p><p className="mt-2 text-xs text-primary">All accounts matched</p></div></div><div className="metric-panel mt-4"><div className="flex items-center justify-between"><p className="text-sm font-medium">Profit &amp; loss snapshot</p><BarChart3 className="size-5 text-gold" /></div><div className="mt-8 grid h-40 grid-cols-12 items-end gap-2">{plSeries.map((height,index) => <span key={index} title={`${monthLabels[index]} · $${(height * 180).toLocaleString("en-CA")}`} className={cn("chart-bar", activeBar === index && "chart-bar-active")} style={{height, animationDelay: `${index * 160}ms`}} />)}</div><p key={activityIndex} className="ticker-line mt-5 flex items-center gap-2 text-xs text-muted-foreground"><span className="live-dot" />{activityFeed[activityIndex]}</p></div></div>
       </section>
 
       <section id="team" className="border-y border-border bg-surface-band/55"><div className="section-shell"><div className="mx-auto max-w-3xl text-center"><p className="eyebrow justify-center">Leadership</p><h2 className="mt-5 text-4xl font-semibold sm:text-5xl">Built by entrepreneurs, for entrepreneurs.</h2><p className="mt-5 leading-7 text-muted-foreground">Practical business empathy meets technical accounting depth.</p></div>
@@ -423,9 +465,9 @@ export function BookkeepingHubPage() {
         <DialogContent className="max-h-[92vh] max-w-3xl overflow-y-auto border-border bg-background/95 p-0 backdrop-blur-xl sm:rounded-lg">
           <div className="border-b border-border px-5 py-5 sm:px-8"><DialogHeader><div className="mb-4 flex items-center gap-2 pr-8">{[1,2,3].map((step) => <div key={step} className="flex flex-1 items-center gap-2"><span className={cn("flex size-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold", bookingStep >= step ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground")}>{bookingStep > step ? <Check className="size-3.5" /> : step}</span>{step < 3 && <span className={cn("h-px flex-1", bookingStep > step ? "bg-primary" : "bg-border")} />}</div>)}</div><DialogTitle className="text-2xl">{bookingStep === 1 ? "Choose your discovery call" : bookingStep === 2 ? "Tell us about your business" : "You’re booked"}</DialogTitle><DialogDescription>{bookingStep === 1 ? "Select a weekday and an available 30-minute slot." : bookingStep === 2 ? "A few details help Chinevu make your call more useful." : "Your consultation details are ready to add to your calendar."}</DialogDescription></DialogHeader></div>
           <div className="p-5 sm:p-8">
-            {bookingStep === 1 && <div><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{dates.map((date) => <Button key={date} variant={selectedDate === date ? "default" : "outline"} onClick={() => {setSelectedDate(date); setSelectedTime("");}} className="h-auto min-h-16 flex-col gap-1 py-2"><span className="text-xs opacity-70">{formatDate(date,"short").split(",")[0]}</span><span>{formatDate(date,"short").split(",").slice(1).join(",")}</span></Button>)}</div>{selectedDate && <div className="mt-8"><p className="mb-4 text-sm font-medium">Available times · EST</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{slots.map((time,index) => <Button key={time} variant={selectedTime === time ? "default" : "outline"} disabled={[3,8,11].includes(index)} onClick={() => setSelectedTime(time)}>{humanTime(time)}</Button>)}</div><p className="mt-3 text-xs text-muted-foreground">Unavailable times are already reserved.</p></div>}<Button size="lg" className="mt-8 w-full" disabled={!selectedDate || !selectedTime} onClick={() => setBookingStep(2)}>Continue to intake <ArrowRight /></Button></div>}
+            {bookingStep === 1 && <div><div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm font-medium">Choose a weekday · next four weeks</p><div className="flex flex-wrap gap-2">{weeks.map((_, index) => <Button key={index} size="sm" variant={activeWeek === index ? "default" : "outline"} onClick={() => setActiveWeek(index)} className="rounded-full px-4 text-xs">Week {index + 1}</Button>)}</div></div><div className="grid grid-cols-2 gap-2 sm:grid-cols-5">{(weeks[activeWeek] ?? []).map((date) => <Button key={date} variant={selectedDate === date ? "default" : "outline"} onClick={() => {setSelectedDate(date); setSelectedTime("");}} className="h-auto min-h-16 flex-col gap-1 py-2"><span className="text-xs opacity-70">{formatDate(date,"short").split(",")[0]}</span><span>{formatDate(date,"short").split(",").slice(1).join(",")}</span></Button>)}</div>{selectedDate && <div className="mt-8"><p className="mb-4 text-sm font-medium">Available times · EST</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{slots.map((time,index) => <Button key={time} variant={selectedTime === time ? "default" : "outline"} disabled={[3,8,11].includes(index)} onClick={() => setSelectedTime(time)}>{humanTime(time)}</Button>)}</div><p className="mt-3 text-xs text-muted-foreground">Unavailable times are already reserved.</p></div>}<Button size="lg" className="mt-8 w-full" disabled={!selectedDate || !selectedTime} onClick={() => setBookingStep(2)}>Continue to intake <ArrowRight /></Button></div>}
             {bookingStep === 2 && <div><div className="mb-6 flex flex-wrap items-center gap-2 rounded-md border border-border bg-card/40 p-3 text-sm"><CalendarDays className="size-4 text-primary" /><span>{formatDate(selectedDate)} at {humanTime(selectedTime)} EST</span><span className="text-muted-foreground">· 30 minutes</span></div><div className="grid gap-5 sm:grid-cols-2"><Field label="Full name" error={errors.fullName}><Input value={intake.fullName} onChange={(event) => updateIntake("fullName", event.target.value)} maxLength={100} autoComplete="name" /></Field><Field label="Business email" error={errors.email}><Input type="email" value={intake.email} onChange={(event) => updateIntake("email", event.target.value)} maxLength={255} autoComplete="email" /></Field><Field label="Phone number" error={errors.phone}><Input type="tel" value={intake.phone} onChange={(event) => updateIntake("phone", event.target.value)} maxLength={30} autoComplete="tel" /></Field><Field label="Business name" error={errors.businessName}><Input value={intake.businessName} onChange={(event) => updateIntake("businessName", event.target.value)} maxLength={120} autoComplete="organization" /></Field><Field label="Industry" error={errors.industry}><Input value={intake.industry} onChange={(event) => updateIntake("industry", event.target.value)} maxLength={80} placeholder="e.g. Construction" /></Field><Field label="Monthly transaction volume" error={errors.volume}><select value={intake.volume} onChange={(event) => updateIntake("volume", event.target.value)} className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="">Select range</option><option>Under 100</option><option>100–300</option><option>301–600</option><option>600+</option></select></Field></div><div className="mt-5"><p className="mb-3 text-sm font-medium">Accounting software</p><div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{(["QuickBooks Online","Xero","FreshBooks","None"] as Intake["software"][]).map((software) => <Button key={software} variant={intake.software === software ? "default" : "outline"} onClick={() => updateIntake("software", software)} className="h-auto min-h-12 whitespace-normal px-2 py-2 text-xs">{software}</Button>)}</div></div><div className="mt-8 flex flex-col-reverse gap-3 sm:flex-row"><Button variant="outline" onClick={() => setBookingStep(1)} className="sm:w-1/3">Back</Button><Button onClick={submitIntake} className="sm:w-2/3">Confirm free consultation <CheckCircle2 /></Button></div></div>}
-            {bookingStep === 3 && <div className="text-center"><div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/15 text-primary"><CheckCircle2 className="size-8" /></div><p className="mt-6 text-sm font-semibold uppercase text-primary">Instant confirmation</p><h3 className="mt-2 text-3xl font-semibold">See you soon, {intake.fullName.split(" ")[0]}.</h3><p className="mx-auto mt-3 max-w-md leading-7 text-muted-foreground">Your 30-minute discovery call is set for {formatDate(selectedDate)} at {humanTime(selectedTime)} EST.</p><div className="mx-auto mt-7 flex max-w-md items-center gap-4 rounded-md border border-border bg-card/45 p-4 text-left"><img src={chinevuAsset.url} alt="Chinevu Amadi" className="size-16 rounded-full object-cover object-top" /><div><p className="font-semibold">Chinevu Amadi, MBA</p><p className="text-sm text-muted-foreground">Lead Bookkeeper · Your consultation host</p></div></div><div className="mt-7 grid gap-3 sm:grid-cols-3"><Button asChild><a href={googleCalendarUrl} target="_blank" rel="noreferrer"><CalendarDays /> Google Calendar</a></Button><Button variant="outline" onClick={downloadIcs}><Download /> Apple / .ics</Button><Button variant="outline" asChild><a href="https://meeting.zoho.com/" target="_blank" rel="noreferrer"><Video /> Meeting access</a></Button></div><div className="mt-7 rounded-md border border-gold/30 bg-gold/10 p-4 text-left"><p className="text-sm font-medium">Your planning snapshot</p><p className="mt-1 text-sm text-muted-foreground">{selectedServices.length} service{selectedServices.length === 1 ? "" : "s"} · {extraAccounts} additional account{extraAccounts === 1 ? "" : "s"} · Starting at {displayPrice(estimate,currency)}/month</p>{catchUp && <p className="mt-1 text-sm text-gold">Catch-up bookkeeping will be scoped on the call.</p>}</div><Button variant="ghost" className="mt-5" onClick={resetBooking}>Book another time</Button></div>}
+            {bookingStep === 3 && <div className="text-center"><div className="mx-auto flex size-16 items-center justify-center rounded-full bg-primary/15 text-primary"><CheckCircle2 className="size-8" /></div><p className="mt-6 text-sm font-semibold uppercase text-primary">Instant confirmation</p><h3 className="mt-2 text-3xl font-semibold">See you soon, {intake.fullName.split(" ")[0]}.</h3><p className="mx-auto mt-3 max-w-md leading-7 text-muted-foreground">Your 30-minute discovery call is set for {formatDate(selectedDate)} at {humanTime(selectedTime)} EST.</p><div className="mx-auto mt-7 flex max-w-md items-center gap-4 rounded-md border border-border bg-card/45 p-4 text-left"><img src="/chinevu.jpg" alt="Chinevu Amadi" className="size-16 rounded-full object-cover object-top" /><div><p className="font-semibold">Chinevu Amadi, MBA</p><p className="text-sm text-muted-foreground">Lead Bookkeeper · Your consultation host</p></div></div><div className="mt-7 grid gap-3 sm:grid-cols-3"><Button asChild><a href={googleCalendarUrl} target="_blank" rel="noreferrer"><CalendarDays /> Google Calendar</a></Button><Button variant="outline" onClick={downloadIcs}><Download /> Apple / .ics</Button><Button variant="outline" asChild><a href="https://meeting.zoho.com/" target="_blank" rel="noreferrer"><Video /> Meeting access</a></Button></div><div className="mt-7 rounded-md border border-gold/30 bg-gold/10 p-4 text-left"><p className="text-sm font-medium">Your planning snapshot</p><p className="mt-1 text-sm text-muted-foreground">{selectedServices.length} service{selectedServices.length === 1 ? "" : "s"} · {extraAccounts} additional account{extraAccounts === 1 ? "" : "s"} · Starting at {displayPrice(estimate)}/month CAD</p>{catchUp && <p className="mt-1 text-sm text-gold">Catch-up bookkeeping will be scoped on the call.</p>}</div><Button variant="ghost" className="mt-5" onClick={resetBooking}>Book another time</Button></div>}
           </div>
         </DialogContent>
       </Dialog>

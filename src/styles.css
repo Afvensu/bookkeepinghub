@@ -205,7 +205,30 @@
 
   .chart-bar {
     @apply block min-h-2 rounded-t-sm bg-primary/75;
+    transition: height 900ms cubic-bezier(0.22, 1, 0.36, 1), background-color 300ms ease, opacity 300ms ease;
+    transform-origin: bottom;
+    animation: chart-breathe 7s ease-in-out infinite;
   }
+
+  .chart-bar-active {
+    @apply bg-primary;
+    box-shadow: 0 0 18px -2px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+
+  .live-dot {
+    @apply relative inline-flex size-1.5 rounded-full bg-primary;
+  }
+
+  .live-dot::after {
+    content: "";
+    @apply absolute inset-0 rounded-full bg-primary;
+    animation: live-ping 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  .ticker-line {
+    animation: soft-fade 500ms ease-out;
+  }
+
 
   .service-card {
     @apply rounded-lg border border-border bg-card/65 p-7 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-primary/35;
@@ -256,10 +279,74 @@
     radial-gradient(circle at 88% 25%, color-mix(in oklab, var(--gold) 9%, transparent), transparent 28%);
 }
 
+@keyframes chart-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.965); }
+}
+
+@keyframes live-ping {
+  0% { transform: scale(1); opacity: 0.55; }
+  70%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes soft-fade {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Premium pointer */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  pointer-events: none;
+  border-radius: 9999px;
+  opacity: 0;
+  transition: opacity 250ms ease, width 200ms ease, height 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--primary);
+  box-shadow: 0 0 12px color-mix(in oklab, var(--primary) 60%, transparent);
+}
+
+.cursor-ring {
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  backdrop-filter: blur(1px);
+}
+
+.cursor-active .cursor-ring {
+  width: 38px;
+  height: 38px;
+  margin: -19px 0 0 -19px;
+  background: color-mix(in oklab, var(--primary) 6%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+
+.cursor-visible .cursor-dot,
+.cursor-visible .cursor-ring {
+  opacity: 1;
+}
+
+@media (pointer: coarse) {
+  .cursor-dot, .cursor-ring { display: none; }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+
+  .cursor-dot, .cursor-ring { display: none; }
 }
