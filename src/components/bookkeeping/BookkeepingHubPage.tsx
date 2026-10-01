@@ -265,6 +265,7 @@ export function BookkeepingHubPage() {
 
   return (
       <main className="min-h-screen overflow-x-clip bg-background text-foreground">
+      <PremiumCursor />
       <div className="ambient-bg" aria-hidden="true" />
             <header
         className={cn(
@@ -320,14 +321,15 @@ export function BookkeepingHubPage() {
           <div className="glass-panel relative overflow-hidden p-5 sm:p-7">
             <div className="mb-8 flex items-center justify-between">
               <div><p className="text-xs font-semibold uppercase text-muted-foreground">Month-end close</p><p className="mt-1 text-2xl font-semibold">Financial clarity</p></div>
-              <div className="status-pill"><CheckCircle2 /> Reconciled</div>
+              <div className="status-pill"><span className="live-dot" /> Reconciled</div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="metric-panel sm:col-span-2">
                 <div className="flex items-start justify-between"><div><p className="text-sm text-muted-foreground">Cash flow status</p><p className="mt-2 text-3xl font-semibold">Healthy</p></div><TrendingUp className="size-7 text-primary" /></div>
                 <div className="mt-8 flex h-28 items-end gap-2" aria-label="Cash flow chart preview">
-                  {[42, 55, 46, 68, 61, 78, 88, 81, 96, 92, 108, 118].map((height, index) => <span key={index} className="chart-bar flex-1" style={{ height }} />)}
+                  {heroSeries.map((height, index) => <span key={index} title={`${monthLabels[index]} · $${(height * 220).toLocaleString("en-CA")}`} className={cn("chart-bar flex-1", activeBar === index && "chart-bar-active")} style={{ height, animationDelay: `${index * 140}ms` }} />)}
                 </div>
+                <p key={activeBar} className="ticker-line mt-4 text-xs text-muted-foreground">{monthLabels[activeBar]} reconciled · ${(((heroSeries[activeBar] ?? 0) * 220)).toLocaleString("en-CA")} net movement</p>
               </div>
               <div className="metric-panel"><p className="text-sm text-muted-foreground">Accounts matched</p><p className="mt-3 text-3xl font-semibold">100%</p><div className="mt-5 h-1.5 overflow-hidden rounded-full bg-secondary"><div className="h-full w-full bg-primary" /></div></div>
               <div className="metric-panel"><p className="text-sm text-muted-foreground">Books closed</p><p className="mt-3 text-3xl font-semibold">On time</p><p className="mt-5 text-xs text-primary">Ready for review</p></div>
