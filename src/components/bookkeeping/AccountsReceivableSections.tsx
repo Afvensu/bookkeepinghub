@@ -39,7 +39,7 @@ export function AccountsReceivableSections({ onBook }: { onBook: () => void }) {
           <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">You send the invoice. We take it from there: tracking every due date, following up on every overdue balance and logging every payment, so your cash flow stops depending on how much time you have to chase customers.</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button size="lg" onClick={onBook} className="h-auto min-h-14 whitespace-normal rounded-full px-6 py-3 text-sm">Book your free 30-min cash flow call <ArrowRight className="shrink-0" /></Button>
-            <Button size="lg" variant="outline" asChild className="min-h-14 rounded-full bg-card/50 px-6"><a href="#pricing">See AR pricing</a></Button>
+            <Button size="lg" variant="outline" asChild className="min-h-14 rounded-full bg-card/50 px-6"><a href="#services">See AR pricing</a></Button>
           </div>
           <p className="mt-5 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><Clock3 className="mt-1 size-4 shrink-0 text-primary" />Monday to Friday, 9:00 AM to 4:00 PM EST</p>
         </div>
