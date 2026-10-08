@@ -1,5 +1,7 @@
 # BookkeepingHub roadmap
 
+- [ ] Recreate the four accounts receivable reference sections above the existing Virtual Bookkeeping content, preserving the theme and existing flows.
+
 - [x] Build the branded single-page marketing experience.
 - [x] Add the live service and currency estimator.
 - [x] Add the time-saved calculator and client portal preview.
