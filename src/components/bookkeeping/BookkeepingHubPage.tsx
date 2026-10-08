@@ -62,7 +62,7 @@ const services = [
     key: "bookkeeping" as const,
     icon: ReceiptText,
     label: "Monthly Bookkeeping",
-    price: 500,
+    price: 300,
     description: "Clean books, closed every month, with every account reconciled.",
     features: ["1 checking + 1 credit card account", "Unlimited transactions", "Monthly financial reports", "Zero transaction caps"],
   },
@@ -107,9 +107,14 @@ const defaultIntake: Intake = {
   volume: "",
 };
 
+const serviceLinks = [
+  ["Accounts Receivable", "#top"],
+  ["Monthly Bookkeeping", "#bookkeeping"],
+  ["Accounts Payable", "#services"],
+  ["All services", "#services"],
+];
+
 const navLinks = [
-  ["Services", "#services"],
-  ["Pricing", "#pricing"],
   ["Process", "#process"],
   ["Team", "#team"],
   ["FAQ", "#faq"],
@@ -322,6 +327,14 @@ export function BookkeepingHubPage() {
             <img src="/logo.png" alt="BookkeepingHub" className="h-11 w-auto max-w-[190px] rounded-sm bg-logo-surface object-contain px-2" />
           </a>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Main navigation">
+            <div className="group relative">
+              <button type="button" className="flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground group-focus-within:text-foreground">Services <ChevronRight className="size-3.5 rotate-90" /></button>
+              <div className="invisible absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-3 opacity-0 transition-all group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                <div className="glass-panel flex flex-col p-2">
+                  {serviceLinks.map(([label, href]) => <a key={href} href={href} className="rounded-md px-3 py-2.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">{label}</a>)}
+                </div>
+              </div>
+            </div>
             {navLinks.map(([label, href]) => (
               <a key={href} href={href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">{label}</a>
             ))}
@@ -336,6 +349,8 @@ export function BookkeepingHubPage() {
         {mobileOpen && (
           <nav className="border-t border-border bg-background px-5 py-5 lg:hidden" aria-label="Mobile navigation">
             <div className="mx-auto flex max-w-7xl flex-col gap-1">
+              <p className="px-3 pt-2 text-xs font-semibold uppercase text-muted-foreground">Services</p>
+              {serviceLinks.map(([label, href]) => <a key={href} href={href} onClick={() => setMobileOpen(false)} className="rounded-md px-6 py-2.5 text-sm hover:bg-accent">{label}</a>)}
               {navLinks.map(([label, href]) => (
                 <a key={href} href={href} onClick={() => setMobileOpen(false)} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-accent">{label}</a>
               ))}
@@ -355,7 +370,7 @@ export function BookkeepingHubPage() {
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" onClick={openBooking} className="h-14 rounded-full px-7 text-base">Book Free 30-Min Discovery Call <ArrowRight /></Button>
             <Button size="lg" variant="outline" asChild className="h-14 rounded-full border-border bg-card/50 px-7 text-base backdrop-blur-xl">
-              <a href="#pricing">Calculate Your Pricing</a>
+              <a href="#services">View Services & Pricing</a>
             </Button>
           </div>
           <p className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><Clock3 className="size-4 text-primary" /> Monday–Friday, 9:00 AM–4:00 PM EST</p>
@@ -398,33 +413,6 @@ export function BookkeepingHubPage() {
               <Button variant={selectedServices.includes(key) ? "default" : "outline"} onClick={() => toggleService(key)} className="mt-8 w-full rounded-full">{selectedServices.includes(key) ? "Included in estimate" : "Add to estimate"}</Button>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section id="pricing" className="section-shell pt-0">
-        <div className="glass-panel grid overflow-hidden lg:grid-cols-[1fr_0.72fr]">
-          <div className="p-6 sm:p-10 lg:p-12">
-            <p className="eyebrow">Live pricing estimator</p><h2 className="mt-5 text-3xl font-semibold sm:text-4xl">Build your monthly support plan.</h2><p className="mt-4 max-w-xl leading-7 text-muted-foreground">Select the services you need. Your estimate stays with you when you book your discovery call.</p>
-            <div className="mt-9 space-y-3">
-              {services.map((service) => (
-                <Button key={service.key} variant="ghost" onClick={() => toggleService(service.key)} className={cn("h-auto w-full justify-between rounded-md border border-border bg-card/30 px-4 py-4 text-left", selectedServices.includes(service.key) && "border-primary/60 bg-primary/10")}>
-                  <span className="flex min-w-0 items-center gap-3"><span className={cn("flex size-5 shrink-0 items-center justify-center rounded-sm border", selectedServices.includes(service.key) ? "border-primary bg-primary text-primary-foreground" : "border-border")}>{selectedServices.includes(service.key) && <Check className="size-3.5" />}</span><span className="whitespace-normal">{service.label}</span></span>
-                  <span className="ml-4 shrink-0 text-muted-foreground">+{displayPrice(service.price)}</span>
-                </Button>
-              ))}
-            </div>
-            <div className="mt-8 border-t border-border pt-8">
-              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">Additional bank / credit card accounts</p><p className="mt-1 text-sm text-muted-foreground">{displayPrice(50)} per account, per month</p></div><div className="flex items-center gap-3"><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.max(0, value - 1))} aria-label="Remove account"><Minus /></Button><span className="w-8 text-center text-lg font-semibold">{extraAccounts}</span><Button variant="outline" size="icon" onClick={() => setExtraAccounts((value) => Math.min(20, value + 1))} aria-label="Add account"><Plus /></Button></div></div>
-              <div className="mt-7 flex items-center justify-between gap-5"><div><p className="font-medium">Historical catch-up needed?</p><p className="mt-1 text-sm text-muted-foreground">Scoped and quoted during your discovery call</p></div><Switch checked={catchUp} onCheckedChange={setCatchUp} aria-label="Historical catch-up needed" /></div>
-              <div className="mt-7 flex items-center justify-between gap-5 rounded-md border border-border bg-card/30 px-4 py-3"><div><p className="font-medium">Billing currency</p><p className="mt-1 text-sm text-muted-foreground">All plans are billed in Canadian dollars</p></div><span className="badge-chip">CAD</span></div>
-            </div>
-          </div>
-          <aside className="estimate-panel flex flex-col justify-between p-6 sm:p-10 lg:p-12">
-            <div><p className="text-sm font-semibold uppercase text-primary">Estimated monthly investment</p><p className="mt-5 break-words text-5xl font-semibold tabular-nums sm:text-6xl">{displayPrice(estimate)}</p><p className="mt-2 text-sm text-muted-foreground">per month · starting estimate · CAD</p></div>
-            <div className="mt-10 space-y-4 border-t border-border pt-7"><div className="flex justify-between text-sm"><span className="text-muted-foreground">Selected services</span><span>{selectedServices.length}</span></div><div className="flex justify-between text-sm"><span className="text-muted-foreground">Additional accounts</span><span>{extraAccounts}</span></div><div className="flex justify-between text-sm"><span className="text-muted-foreground">Catch-up</span><span>{catchUp ? "Needs scoping" : "Not selected"}</span></div></div>
-            <Button size="lg" onClick={openBooking} className="mt-10 h-14 w-full rounded-full">Lock In Estimate & Book Call <ArrowRight /></Button>
-            <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">Final pricing is confirmed after we understand your books and workflow.</p>
-          </aside>
         </div>
       </section>
 
