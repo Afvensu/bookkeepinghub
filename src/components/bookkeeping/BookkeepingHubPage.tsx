@@ -111,7 +111,6 @@ const serviceLinks = [
   ["Accounts Receivable", "#top"],
   ["Monthly Bookkeeping", "#bookkeeping"],
   ["Accounts Payable", "#services"],
-  ["All services", "#services"],
 ];
 
 const navLinks = [
