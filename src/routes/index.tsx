@@ -5,10 +5,10 @@ export const Route = createFileRoute("/")({
   component: BookkeepingHubPage,
   head: () => ({
     meta: [
-      { title: "BookkeepingHub | Virtual Bookkeeping in Brampton, Ontario" },
-      { name: "description", content: "Clear, audit-ready bookkeeping, accounts payable, and accounts receivable support for growing businesses. Book a free 30-minute discovery call." },
-      { property: "og:title", content: "BookkeepingHub | Clear Financials. Zero Guesswork." },
-      { property: "og:description", content: "Virtual bookkeeping and accounting operations from Brampton, Ontario. Reconciled accounts, timely reports, and a same-day custom scope." },
+      { title: "BookkeepingHub | Accounts Receivable & Virtual Bookkeeping" },
+      { name: "description", content: "Accounts receivable management and virtual bookkeeping from Brampton, Ontario. Invoice tracking, payment follow-up and clear reports for growing Canadian businesses." },
+      { property: "og:title", content: "BookkeepingHub | Accounts Receivable & Virtual Bookkeeping" },
+      { property: "og:description", content: "You did the work. We make sure you get paid for it. Accounts receivable support, reconciled books and clear financial reporting. Book a free 30-minute call." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "/" },
       { name: "twitter:card", content: "summary_large_image" },

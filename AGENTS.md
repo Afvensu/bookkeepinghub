@@ -12,3 +12,4 @@
 ## Project architecture
 
 - Keep BookkeepingHub as a single-page, frontend-state experience until persistent booking and integrations are explicitly requested, so the current flow remains demonstrable without backend dependencies.
+- Keep the accounts receivable opening in a focused section component with booking delegated to the parent page, so every call action shares the existing intake state.

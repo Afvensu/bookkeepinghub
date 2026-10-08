@@ -284,6 +284,20 @@
   50% { transform: scaleY(0.965); }
 }
 
+.ar-opening {
+  min-height: min(780px, calc(100svh - 140px));
+}
+
+.ar-aging-bar {
+  transform-origin: left;
+  animation: ar-aging-breathe 8s ease-in-out infinite;
+}
+
+@keyframes ar-aging-breathe {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.98); }
+}
+
 @keyframes live-ping {
   0% { transform: scale(1); opacity: 0.55; }
   70%, 100% { transform: scale(2.6); opacity: 0; }

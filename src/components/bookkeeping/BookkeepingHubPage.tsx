@@ -43,6 +43,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { PremiumCursor } from "./PremiumCursor";
+import { AccountsReceivableSections } from "./AccountsReceivableSections";
 
 type ServiceKey = "bookkeeping" | "ap" | "ar";
 
@@ -344,10 +345,12 @@ export function BookkeepingHubPage() {
         )}
       </header>
 
-      <section id="top" className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-14 sm:min-h-[760px] lg:grid-cols-[1.12fr_0.88fr] lg:px-8 lg:py-20">
+      <AccountsReceivableSections onBook={openBooking} />
+
+      <section id="bookkeeping" className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-14 sm:min-h-[760px] lg:grid-cols-[1.12fr_0.88fr] lg:px-8 lg:py-20">
         <div className="relative z-10">
           <div className="eyebrow mb-6"><Sparkles /> Virtual bookkeeping for growing businesses</div>
-          <h1 className="max-w-4xl text-4xl font-semibold leading-[1.06] tracking-normal sm:text-6xl lg:text-7xl">Clear financials.<br /><span className="text-highlight">Reconciled accounts.</span><br />Zero guesswork.</h1>
+          <h2 className="max-w-4xl text-4xl font-semibold leading-[1.06] tracking-normal sm:text-6xl lg:text-7xl">Clear financials.<br /><span className="text-highlight">Reconciled accounts.</span><br />Zero guesswork.</h2>
           <p className="mt-7 max-w-2xl text-lg leading-8 text-muted-foreground">We keep your accounts reconciled down to the penny, your reports on time, and your finances crystal clear—so you can run the business instead of chasing the numbers.</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <Button size="lg" onClick={openBooking} className="h-14 rounded-full px-7 text-base">Book Free 30-Min Discovery Call <ArrowRight /></Button>
