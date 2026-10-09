@@ -1,13 +1,5 @@
-import { ArrowRight, BriefcaseBusiness, Check, Clock3, House, Wrench } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Clock3, House, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const agingRows = [
-  { label: "Current", amount: "$38,400", width: "w-[88%]", tone: "bg-primary" },
-  { label: "1–30", amount: "$19,850", width: "w-[46%]", tone: "bg-gold/75" },
-  { label: "31–60", amount: "$9,120", width: "w-[22%]", tone: "bg-gold" },
-  { label: "61–90", amount: "$3,600", width: "w-[9%]", tone: "bg-destructive/70" },
-  { label: "90+", amount: "$1,200", width: "w-[3%]", tone: "bg-destructive" },
-];
 
 const painPoints = [
   ["Sent, then forgotten", "You send the invoice and move on to the next job. Nobody is watching the due date, and nobody notices when it passes."],
@@ -32,28 +24,16 @@ const industries = [
 export function AccountsReceivableSections({ onBook }: { onBook: () => void }) {
   return (
     <>
-      <section id="top" className="ar-opening relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-14 lg:grid-cols-[1.05fr_0.95fr] lg:px-8 lg:py-20">
-        <div className="relative z-10">
+      <section id="top" className="ar-opening relative mx-auto flex max-w-5xl flex-col items-center justify-center px-5 py-14 text-center lg:px-8 lg:py-20">
+        <div className="relative z-10 flex flex-col items-center">
           <p className="eyebrow max-w-lg leading-6">Accounts receivable management · Brampton, ON · Serving Canada virtually</p>
-          <h1 className="mt-6 max-w-2xl text-4xl font-semibold leading-[1.08] sm:text-6xl">You did the work.<br /><span className="text-highlight">We make sure you get paid for it.</span></h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-muted-foreground">You send the invoice. We take it from there: tracking every due date, following up on every overdue balance and logging every payment, so your cash flow stops depending on how much time you have to chase customers.</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.08] sm:text-6xl lg:text-7xl">You did the work.<br /><span className="text-highlight">We make sure you get paid for it.</span></h1>
+          <p className="mt-7 max-w-2xl text-lg leading-8 text-muted-foreground">You send the invoice. We take it from there: tracking every due date, following up on every overdue balance and logging every payment, so your cash flow stops depending on how much time you have to chase customers.</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
             <Button size="lg" onClick={onBook} className="h-auto min-h-14 whitespace-normal rounded-full px-6 py-3 text-sm">Book your free 30-min cash flow call <ArrowRight className="shrink-0" /></Button>
             <Button size="lg" variant="outline" asChild className="min-h-14 rounded-full bg-card/50 px-6"><a href="#services">See AR pricing</a></Button>
           </div>
           <p className="mt-5 flex items-start gap-2 text-sm leading-6 text-muted-foreground"><Clock3 className="mt-1 size-4 shrink-0 text-primary" />Monday to Friday, 9:00 AM to 4:00 PM EST</p>
-        </div>
-        <div className="glass-panel relative w-full p-5 sm:p-7" aria-label="Sample receivables aging report">
-          <div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-lg font-semibold">Receivables aging</h2><span className="text-[10px] font-semibold uppercase text-muted-foreground">Sample client view · CAD</span></div>
-          <p className="mt-2 text-sm text-muted-foreground">Outstanding by days overdue</p>
-          <div className="mt-8 space-y-5">
-            {agingRows.map((row) => <div key={row.label} className="grid grid-cols-[3rem_1fr_4.5rem] items-center gap-3 sm:grid-cols-[4rem_1fr_5rem]"><span className="text-sm text-muted-foreground">{row.label}</span><div className="h-2.5 overflow-hidden rounded-sm bg-secondary"><span className={`ar-aging-bar block h-full rounded-sm ${row.width} ${row.tone}`} /></div><span className="text-right text-sm font-semibold tabular-nums">{row.amount}</span></div>)}
-          </div>
-          <ul className="mt-8 space-y-4 border-t border-border pt-6 text-xs leading-6 text-muted-foreground">
-            <li className="flex items-start gap-3"><Check className="mt-1 size-4 shrink-0 text-primary" /><span>Reminder sent to Northline Framing · INV-1042 · 7 days overdue</span></li>
-            <li className="flex items-start gap-3"><Check className="mt-1 size-4 shrink-0 text-primary" /><span>Payment received and matched in QuickBooks · $4,850</span></li>
-            <li className="flex items-start gap-3"><Clock3 className="mt-1 size-4 shrink-0 text-gold" /><span>Ridgeway Homes · 62 days overdue · flagged for your call</span></li>
-          </ul>
         </div>
       </section>
 
