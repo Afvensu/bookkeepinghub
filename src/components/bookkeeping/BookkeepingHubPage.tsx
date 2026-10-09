@@ -67,14 +67,6 @@ const services = [
     features: ["1 checking + 1 credit card account", "Unlimited transactions", "Monthly financial reports", "Zero transaction caps"],
   },
   {
-    key: "ap" as const,
-    icon: WalletCards,
-    label: "Accounts Payable",
-    price: 700,
-    description: "Every bill captured, organized, and scheduled with precision.",
-    features: ["Bill entry", "Vendor tracking", "Payment scheduling", "AP aging visibility"],
-  },
-  {
     key: "ar" as const,
     icon: Banknote,
     label: "Accounts Receivable",
@@ -110,7 +102,6 @@ const defaultIntake: Intake = {
 const serviceLinks = [
   ["Accounts Receivable", "#top"],
   ["Monthly Bookkeeping", "#bookkeeping"],
-  ["Accounts Payable", "#services"],
 ];
 
 const navLinks = [
@@ -402,14 +393,14 @@ export function BookkeepingHubPage() {
       </section>
 
       <section id="services" className="section-shell">
-        <div className="section-heading"><div><p className="eyebrow">Built around your workflow</p><h2>Expert support where your books need it most.</h2></div><p>Choose one focused service or combine all three into a complete finance-operations system.</p></div>
-        <div className="mt-12 grid gap-5 lg:grid-cols-3">
+        <div className="section-heading"><div><p className="eyebrow">Built around your workflow</p><h2>Expert support where your books need it most.</h2></div><p>Choose one focused service or combine both for complete, worry-free finances.</p></div>
+        <div className="mt-12 grid gap-5 mx-auto max-w-4xl md:grid-cols-2">
           {services.map(({ key, icon: Icon, label, price, description, features }) => (
-            <article key={key} className={cn("service-card", selectedServices.includes(key) && "service-card-selected")}>
+            <article key={key} className={"service-card"}>
               <div className="flex items-start justify-between"><div className="icon-box"><Icon /></div><span className="text-xs font-semibold uppercase text-muted-foreground">From {displayPrice(price)}/mo CAD</span></div>
               <h3 className="mt-8 text-2xl font-semibold">{label}</h3><p className="mt-3 min-h-14 text-sm leading-6 text-muted-foreground">{description}</p>
               <ul className="mt-7 space-y-3">{features.map((feature) => <li key={feature} className="flex gap-3 text-sm"><Check className="mt-0.5 size-4 shrink-0 text-primary" />{feature}</li>)}</ul>
-              <Button variant={selectedServices.includes(key) ? "default" : "outline"} onClick={() => toggleService(key)} className="mt-8 w-full rounded-full">{selectedServices.includes(key) ? "Included in estimate" : "Add to estimate"}</Button>
+              <Button onClick={openBooking} className="mt-8 w-full rounded-full">Book discovery call <ArrowRight /></Button>
             </article>
           ))}
         </div>
@@ -428,9 +419,8 @@ export function BookkeepingHubPage() {
         </div>
       </section>
 
-      <section className="section-shell grid items-stretch gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+      <section className="section-shell mx-auto max-w-3xl">
         <div className="glass-panel p-7 sm:p-10"><p className="eyebrow">Time-saved calculator</p><h2 className="mt-5 text-3xl font-semibold">Get your month back.</h2><p className="mt-4 leading-7 text-muted-foreground">How many hours do you spend on manual bookkeeping each month?</p><div className="mt-10 flex items-end justify-between"><span className="text-6xl font-semibold">{hours}</span><span className="pb-2 text-sm text-muted-foreground">hours / month</span></div><Slider className="mt-7" value={[hours]} onValueChange={([value]) => setHours(value ?? 1)} min={1} max={40} step={1} aria-label="Monthly bookkeeping hours" /><div className="mt-9 border-t border-border pt-7"><p className="text-sm text-muted-foreground">Estimated annual time reclaimed</p><p className="mt-2 text-4xl font-semibold text-highlight">{hours * 12} hours</p><p className="mt-3 text-sm leading-6 text-muted-foreground">That’s approximately {Math.round((hours * 12) / 8)} full workdays redirected to your business.</p></div></div>
-        <div className="glass-panel overflow-hidden p-5 sm:p-8"><div className="mb-7 flex items-center justify-between"><div><p className="text-xs font-semibold uppercase text-muted-foreground">Client portal preview</p><h3 className="mt-2 text-2xl font-semibold">Financial command centre</h3></div><span className="status-pill"><span className="live-dot" /> Live</span></div><div className="grid gap-4 sm:grid-cols-3"><div className="metric-panel"><p className="text-xs text-muted-foreground">Net income</p><p className="mt-2 text-2xl font-semibold tabular-nums">${netIncome.toLocaleString("en-CA")}</p><p className="mt-2 text-xs text-primary">↑ 8.2% this month</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Cash on hand</p><p className="mt-2 text-2xl font-semibold tabular-nums">${cashOnHand.toLocaleString("en-CA")}</p><p className="mt-2 text-xs text-muted-foreground">Healthy runway</p></div><div className="metric-panel"><p className="text-xs text-muted-foreground">Reconciliation</p><p className="mt-2 text-2xl font-semibold">100%</p><p className="mt-2 text-xs text-primary">All accounts matched</p></div></div><div className="metric-panel mt-4"><div className="flex items-center justify-between"><p className="text-sm font-medium">Profit &amp; loss snapshot</p><BarChart3 className="size-5 text-gold" /></div><div className="mt-8 grid h-40 grid-cols-12 items-end gap-2">{plSeries.map((height,index) => <span key={index} title={`${monthLabels[index]} · $${(height * 180).toLocaleString("en-CA")}`} className={cn("chart-bar", activeBar === index && "chart-bar-active")} style={{height, animationDelay: `${index * 160}ms`}} />)}</div><p key={activityIndex} className="ticker-line mt-5 flex items-center gap-2 text-xs text-muted-foreground"><span className="live-dot" />{activityFeed[activityIndex]}</p></div></div>
       </section>
 
       <section id="team" className="border-y border-border bg-surface-band/55"><div className="section-shell"><div className="mx-auto max-w-3xl text-center"><p className="eyebrow justify-center">Leadership</p><h2 className="mt-5 text-4xl font-semibold sm:text-5xl">Built by entrepreneurs, for entrepreneurs.</h2><p className="mt-5 leading-7 text-muted-foreground">Practical business empathy meets technical accounting depth.</p></div>
