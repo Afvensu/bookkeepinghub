@@ -28,6 +28,8 @@ import {
   X,
 } from "lucide-react";
 import { z } from "zod";
+import { trackEvent } from "@/lib/meta-pixel";
+import { ConsentBanner, openCookieSettings } from "./ConsentBanner";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -225,7 +227,7 @@ export function BookkeepingHubPage() {
     [],
   );
 
-  const openBooking = () => setBookingOpen(true);
+  const openBooking = () => { setBookingOpen(true); void trackEvent("InitiateCheckout"); };
 
   const toggleService = (key: ServiceKey) => {
     setSelectedServices((current) =>
@@ -250,6 +252,8 @@ export function BookkeepingHubPage() {
       return;
     }
     setBookingStep(3);
+    void trackEvent("Schedule");
+    void trackEvent("Lead");
   };
 
   const resetBooking = () => {
@@ -439,7 +443,8 @@ export function BookkeepingHubPage() {
 
       <section className="section-shell pt-0"><div className="cta-band"><div><p className="eyebrow">Your books can feel lighter</p><h2 className="mt-5 max-w-2xl text-4xl font-semibold sm:text-5xl">One clear conversation starts the process.</h2><p className="mt-5 max-w-2xl leading-7 text-muted-foreground">Bring your questions. We’ll bring clarity, a practical next step, and a same-day custom scope.</p></div><Button size="lg" onClick={openBooking} className="h-14 shrink-0 rounded-full px-7">Book your free call <ArrowRight /></Button></div></section>
 
-      <footer className="border-t border-border bg-surface-band/70"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-8"><div><img src="/logo.png" alt="BookkeepingHub" className="h-14 w-auto max-w-[230px] rounded-sm bg-logo-surface object-contain px-2" /><p className="mt-5 max-w-sm text-sm leading-6 text-muted-foreground">Virtual bookkeeping and accounting operations for owners who want dependable numbers and a clearer view of their business.</p></div><div><p className="text-sm font-semibold">Contact</p><div className="mt-5 space-y-4 text-sm text-muted-foreground"><a className="flex gap-3 hover:text-foreground" href="tel:+12899012092"><Phone className="size-4 text-primary" />+1 289 901 2092</a><a className="flex gap-3 hover:text-foreground" href="mailto:info@bookkeepinghub.ca"><Mail className="size-4 text-primary" />info@bookkeepinghub.ca</a><p className="flex gap-3"><MapPin className="size-4 shrink-0 text-primary" />28 Whitwell Drive, Brampton, Ontario, Canada</p></div></div><div><p className="text-sm font-semibold">Business hours</p><p className="mt-5 text-sm leading-6 text-muted-foreground">Monday–Friday<br />9:00 AM–4:00 PM EST<br /><span className="text-foreground">Closed Saturday & Sunday</span></p></div></div><div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-muted-foreground sm:flex-row sm:justify-between lg:px-8"><span>© {new Date().getFullYear()} BookkeepingHub. All rights reserved.</span><span>Brampton, Ontario · Serving businesses virtually</span></div></div></footer>
+      <footer className="border-t border-border bg-surface-band/70"><div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 lg:grid-cols-[1.2fr_1fr_1fr] lg:px-8"><div><img src="/logo.png" alt="BookkeepingHub" className="h-14 w-auto max-w-[230px] rounded-sm bg-logo-surface object-contain px-2" /><p className="mt-5 max-w-sm text-sm leading-6 text-muted-foreground">Virtual bookkeeping and accounting operations for owners who want dependable numbers and a clearer view of their business.</p></div><div><p className="text-sm font-semibold">Contact</p><div className="mt-5 space-y-4 text-sm text-muted-foreground"><a className="flex gap-3 hover:text-foreground" href="tel:+12899012092" onClick={() => void trackEvent("Contact")}><Phone className="size-4 text-primary" />+1 289 901 2092</a><a className="flex gap-3 hover:text-foreground" href="mailto:info@bookkeepinghub.ca" onClick={() => void trackEvent("Contact")}><Mail className="size-4 text-primary" />info@bookkeepinghub.ca</a><p className="flex gap-3"><MapPin className="size-4 shrink-0 text-primary" />28 Whitwell Drive, Brampton, Ontario, Canada</p></div></div><div><p className="text-sm font-semibold">Business hours</p><p className="mt-5 text-sm leading-6 text-muted-foreground">Monday–Friday<br />9:00 AM–4:00 PM EST<br /><span className="text-foreground">Closed Saturday & Sunday</span></p></div></div><div className="border-t border-border"><div className="mx-auto flex max-w-7xl flex-col gap-2 px-5 py-6 text-xs text-muted-foreground sm:flex-row sm:justify-between lg:px-8"><span>© {new Date().getFullYear()} BookkeepingHub. All rights reserved.</span><span className="flex gap-4"><a href="/privacy" className="hover:text-foreground">Privacy policy</a><button type="button" onClick={openCookieSettings} className="hover:text-foreground">Cookie settings</button><span>Brampton, Ontario</span></span></div></div></footer>
+      <ConsentBanner />
 
       <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
         <DialogContent className="max-h-[92vh] max-w-3xl overflow-y-auto border-border bg-background/95 p-0 backdrop-blur-xl sm:rounded-lg">
